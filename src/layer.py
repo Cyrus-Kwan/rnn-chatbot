@@ -2,8 +2,29 @@ from typing import Callable
 from neuron import *
 
 class Layer():
-    def __init__(self):
-        pass
+    def __init__(self, num_neurons: int, num_inputs: int, active: Callable, learn: Callable):
+        self.outputs    = [0.0*num_neurons]
+        self.num_inputs = num_inputs
+        self.learn      = learn
+        
+        # Initialize an array of zero'd neurons equal to the params
+        self.neurons    = [
+            Neuron(
+                inputs  = [0.0*num_inputs],
+                weights =[0.0*num_inputs],
+                active  = active,
+                learn   = learn
+            ) for n in range(num_neurons)
+        ]
+
+    def forward(self):
+        '''
+        Updates the weights of each neuron in the layer. 
+        The outputs of each layer are used as inputs for the proceeding layers.
+        '''
+        outputs = []
+
+        return outputs
 
 def main():
     return
