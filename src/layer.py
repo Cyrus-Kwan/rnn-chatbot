@@ -11,19 +11,22 @@ class Layer():
         self.neurons    = [
             Neuron(
                 inputs  = [0.0*num_inputs],
-                weights =[0.0*num_inputs],
+                weights = [0.0*num_inputs],
                 active  = active,
                 learn   = learn
             ) for n in range(num_neurons)
         ]
 
-    def forward(self):
+    def forward(self, inputs: list[float]) -> list[float]:
         '''
-        Updates the weights of each neuron in the layer. 
         The outputs of each layer are used as inputs for the proceeding layers.
         '''
         outputs = []
+        for neuron in self.neurons:
+            neuron.inputs   = inputs
+            outputs.append(neuron.active(neuron))
 
+        self.outputs    = outputs
         return outputs
 
 def main():
