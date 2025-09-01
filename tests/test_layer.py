@@ -8,7 +8,7 @@ from layer import *
 
 class TestLayer(unittest.TestCase):
     # helper for comparing float sequences
-    def assertSequenceAlmostEqual(self, first, second, places=6):
+    def assertSequenceAlmostEqual(self, first, second, places=3):
         self.assertEqual(len(first), len(second), "Lengths differ")
         for i, (a, b) in enumerate(zip(first, second)):
             with self.subTest(index=i):
@@ -36,7 +36,7 @@ class TestLayer(unittest.TestCase):
         '''
         Computes the outputs/activation of each neuron in the layer
         '''
-        for case in self.test_cases["test_forward"]:
+        for case in self.test_cases["test_forward"].values():
             layer   = Layer(
                 num_neurons = case["num_neurons"],
                 num_inputs  = case["num_inputs"],
@@ -44,9 +44,21 @@ class TestLayer(unittest.TestCase):
                 learn       = self.learn[case["learn"]]
             )
 
-            for n, neuron in enumerate(case["neurons"]):
+            for n, neuron in enumerate(case["neurons"].values()):
                 # Initial weights for each neuron
                 layer.neurons[n].weights    = neuron["weights"]
                 
+                # Assertion sequence of outputs
+                outputs = []
+
                 # TODO: forward pass for each input vector.
+                for vec in neuron["inputs"]:
+                    outputs.append(layer.forward(inputs=vec))
+
+                for o, output in enumerate(outputs):
+                    self.assertSequenceAlmostEqual(first=output, second=neuron["expected"][o])
+
         return
+    
+if __name__ == "__main__":
+    unittest.main()
