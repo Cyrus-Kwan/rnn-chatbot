@@ -1,0 +1,10 @@
+The mouse is in the house.
+The cat is on the roof.
+The dog chases the mouse.
+The house is big.
+The mouse runs fast.
+The cat sleeps on the mat.
+The dog barks loudly.
+The mouse hides in the house.
+The cat watches the mouse.
+The dog guards the house.
