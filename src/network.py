@@ -2,7 +2,7 @@ from typing import Callable
 from layer import *
 
 class Network():
-    def __init__(self, layer_sizes:list[int], active:Callable, learn:Callable):
+    def __init__(self, layer_sizes:list[int], active:Callable, learn:Callable, random_seed=42):
         '''
         Constructor creates layers in the network each with the specified activaiton function
         and learning signal.
@@ -18,7 +18,8 @@ class Network():
                 num_neurons = size, 
                 num_inputs  = layer_sizes[s-1], # Preceeding output as input to the current layer
                 active      = active,
-                learn       = learn
+                learn       = learn,
+                random_seed = random_seed
             )
 
             self.layers.append(new_layer)
