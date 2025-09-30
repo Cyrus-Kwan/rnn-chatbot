@@ -1,6 +1,5 @@
 from typing import Callable
 from layer import *
-import matplotlib.pyplot as plt
 
 class Network():
     def __init__(self, layer_sizes:list[int], active:Callable, learn:Callable):
