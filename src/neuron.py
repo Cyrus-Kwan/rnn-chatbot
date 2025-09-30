@@ -7,6 +7,7 @@ class Neuron():
         self.weights:list[float]    = weights
         self.active:Callable    = active
         self.learn:Callable     = learn
+        self.prev_delta:list    = [0.0] * len(weights)  # added for momentum
 
     def scalar(self) -> float:
         '''
