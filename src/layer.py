@@ -1,8 +1,11 @@
 from typing import Callable
 from neuron import *
+import random
 
 class Layer():
-    def __init__(self, num_neurons: int, num_inputs: int, active: Callable, learn: Callable):
+    def __init__(self, num_neurons:int, num_inputs:int, active:Callable, learn:Callable, random_seed:int):
+        random.seed(random_seed)
+
         self.outputs    = [0.0] * num_neurons
         self.num_inputs = num_inputs
         self.learn      = learn
@@ -13,12 +16,14 @@ class Layer():
             self.derivative = Derivative.bipolar
         elif active == Activation.logistic:
             self.derivative = Derivative.logistic
+        elif active == Activation.relu:
+            self.derivative = Derivative.relu
         
         # Initialize an array of zero'd neurons equal to the params
         self.neurons    = [
             Neuron(
-                inputs  = [0.0] * num_inputs + [1], # Include bias term input
-                weights = [0.0] * num_inputs + [1], # Include bias term weight
+                inputs  = [random.uniform(-0.5, 0.5)] * num_inputs + [1], # Include bias term input
+                weights = [random.uniform(-0.5, 0.5)] * num_inputs + [1], # Include bias term weight
                 active  = active,
                 learn   = learn
             ) for n in range(num_neurons)
@@ -30,8 +35,7 @@ class Layer():
         '''
         outputs = []
         for neuron in self.neurons:
-            for v, vector in enumerate(inputs):
-                neuron.inputs[v] = vector
+            neuron.inputs[:-1]  = inputs    # Do not overwrite bias
             outputs.append(neuron.active(neuron))
 
         self.outputs    = outputs

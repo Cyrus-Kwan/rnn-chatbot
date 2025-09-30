@@ -47,6 +47,13 @@ class Activation():
     def hyper_log(self:Neuron) -> float:
         return tanh(self.scalar())
     
+    @staticmethod
+    def relu(self:Neuron) -> float:
+        if self.scalar() > 0:
+            return self.scalar()
+        else:
+            return 0
+    
 class LearningRule():
     @staticmethod
     def hebbian(self:Neuron, c:float) -> None:
@@ -117,6 +124,13 @@ class Derivative():
     @staticmethod
     def bipolar(z:float) -> float:
         return 0.5 * (1 - z**2)
+    
+    @staticmethod
+    def relu(z:float) -> float:
+        if z > 0:
+            return 1
+        else:
+            return 0
 
 def main():
     return
