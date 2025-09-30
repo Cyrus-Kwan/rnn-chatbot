@@ -1,4 +1,5 @@
 {
     "source":"src",
-    "tests":"tests"
+    "tests":"tests",
+    "data":"data"
 }
