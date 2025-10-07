@@ -18,10 +18,10 @@ class RecurrentLayer(Layer):
 
         # Rows: Current neuron receiving feedback
         # Cols: Previous neuron sending feedback
-        self.hidden_weights = [[0.0] * num_neurons] * num_neurons
+        self.hidden_weights = [[0.0 for _ in range(num_neurons)] for _ in range(num_neurons)]
 
         # Store previous hidden outputs
-        self.prev_output    = [0.0] * num_neurons
+        self.prev_output    = [0.0 for _ in range(num_neurons)]
     
     def forward(self, inputs:list[float]) -> list[float]:
         outputs = []
@@ -35,8 +35,9 @@ class RecurrentLayer(Layer):
             # Add hidden contribution to bias term
             neuron.inputs[-1]   += hidden_sum   # bias + hidden feedback
 
-            outputs.append(neuron.active(neuron))
+            outputs.append(neuron.active())
 
         self.prev_output    = outputs
         self.outputs        = outputs
+
         return outputs
