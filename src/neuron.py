@@ -1,3 +1,4 @@
+import inspect
 from typing import Callable
 from math import exp, tanh
 
@@ -5,7 +6,7 @@ class Neuron():
     def __init__(self, inputs, weights, active, learn):
         self.inputs:list[float]     = inputs
         self.weights:list[float]    = weights
-        self.active:Callable    = active
+        self._active:Callable   = active
         self.learn:Callable     = learn
         self.prev_delta:list    = [0.0] * len(weights)  # added for momentum
 
@@ -19,6 +20,23 @@ class Neuron():
             result  += i * w
 
         return result
+    
+    def active(self, *args, **kwargs):
+        '''
+        Generic wrapper: calls the actual activation function
+        with any number of positional or keyword arguments.
+        '''
+        # Inspect how many parameters the actual activation function expects
+        sig = inspect.signature(self._active)
+        params = list(sig.parameters.keys())
+
+        # Always include self
+        if len(params) == 1:
+            # Only 'self' expected
+            return self._active(self)
+        else:
+            # Pass whatever extra arguments you got
+            return self._active(self, *args, **kwargs)
 
 class Activation():
     @staticmethod
@@ -54,6 +72,19 @@ class Activation():
         else:
             return 0
     
+    @staticmethod
+    def softmax(self:Neuron, neurons:list[Neuron]) -> float:
+        '''
+        Accepts the entire list of neurons in the layer to form a
+        probability distribution
+        '''
+        scalars     = [n.scalar() for n in neurons]
+        max_z       = max(scalars)
+        exps        = [exp(z - max_z) for z in scalars]
+        sum_exps    = sum(exps)
+
+        return exp(self.scalar() - max_z) / sum_exps
+        
 class LearningRule():
     @staticmethod
     def hebbian(self:Neuron, c:float) -> None:
@@ -118,6 +149,13 @@ class LearningRule():
 
 class Derivative():
     @staticmethod
+    def sign_zero(z:float) -> float:
+        return 1
+    
+    def sign_one(z:float) -> float:
+        return 1
+    
+    @staticmethod
     def logistic(z:float) -> float:
         return z * (1 - z)
     
@@ -125,15 +163,16 @@ class Derivative():
     def bipolar(z:float) -> float:
         return 0.5 * (1 - z**2)
     
+    def hyper_log(z:float) -> float:
+        return 1 - z**2
+    
     @staticmethod
     def relu(z:float) -> float:
         if z > 0:
             return 1
         else:
             return 0
-
-def main():
-    return
-
-if __name__ == "__main__":
-    main()
+        
+    @staticmethod
+    def softmax(z:float) -> float:
+        return 1
