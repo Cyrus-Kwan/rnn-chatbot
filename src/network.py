@@ -25,7 +25,7 @@ class Network():
 
             self.layers.append(new_layer)
 
-    def train(self, inputs:list[float], targets:list[float], learning_rate:float, momentum:float):
+    def train(self, inputs:list[list[float]], targets:list[float], learning_rate:float, momentum:float):
         '''
         Updates the weights of each neuron iterating over a sequence of input
         vectors and corresponding output vector labels.
@@ -54,15 +54,7 @@ class Network():
             scalars.append(scalar)
 
         # 2. Error calculation: 2D array because each array will hold outputs for each layer
-        signals     = None
-        if self.loss == "mse":
-            # Calculate the initial signal error (d-z) * f'(activation) from output layer
-            errors      = [[d - z for d, z in zip(targets, activations[-1])]]
-            derivatives = [[self.layers[-1].derivative(z) for z in activations[-1]]]
-            signals     = [[error * derivative for error, derivative in zip(errors[-1], derivatives[-1])]]
-        elif self.loss == "cross-entropy":
-            # Calculate the initial signal error (z-d) from output layer
-            signals     = [[d - z for d, z in zip(targets, activations[-1])]]
+        signals = [self._calculate_error(activations[-1], targets, self.layers[-1])]
 
         # 3. Back propagation: Calculate the the error signal for each hidden layer
         signals = self._backpropagation(signals)
@@ -71,9 +63,22 @@ class Network():
         deltas  = self._get_deltas(signals, learning_rate)
 
         # 5. Update weights
-        self._update(deltas, momentum)
+        self._update(deltas, signals, learning_rate, momentum)
         return
     
+    def _calculate_error(self, output, targets, layer):
+        signals = None
+        if self.loss == "mse":
+            # Calculate the initial signal error (d-z) * f'(activation) from output layer
+            errors      = [d - z for d, z in zip(targets, output)]
+            derivatives = [layer.derivative(z) for z in output]
+            signals     = [error * derivative for error, derivative in zip(errors, derivatives)]
+        elif self.loss == "cross-entropy":
+            # Calculate the initial signal error (z-d) from output layer
+            signals     = [d - z for d, z in zip(targets, output)]
+
+        return signals
+
     def _backpropagation(self, signals:list[list[float]]):
         '''
         Calculates the error signal for each hidden layer
@@ -100,8 +105,10 @@ class Network():
                 if curr_layer.derivative == Derivative.relu:
                     z   = curr_neuron.scalar()                      # pre-activation
                 else:
-                    z   = curr_neuron.active(curr_layer.neurons)    # post-activation
-                    
+                    z   = curr_neuron.active(
+                        curr_neuron.scalar(), curr_layer.neurons    # post-activation
+                    )
+
                 # Each current layer neuron corresponds to a weight of the next layer neurons
                 neuron_signal   = []    # Temporary storage for dot product calculation
                 for nn, next_neuron in enumerate(next_layer.neurons):
@@ -135,10 +142,10 @@ class Network():
                     neuron_deltas.append(delta)
                 layer_deltas.append(neuron_deltas)
             deltas.append(layer_deltas)
-        
+
         return deltas
     
-    def _update(self, deltas:list[list[float]], momentum:float):
+    def _update(self, deltas:list[list[float]], signals:list[float], learning_rate:float, momentum:float):
         '''
         Updates the weight of each neuron by adding the delta to the current weight
         '''

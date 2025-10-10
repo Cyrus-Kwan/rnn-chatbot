@@ -2,6 +2,7 @@ from typing import Callable
 from recurrent_layer import *
 from layer import *
 from network import *
+import numpy as np
 
 class RecurrentNetwork(Network):
     def __init__(self, layer_sizes:list[int], active:Callable, learn:Callable, loss:str="cross-entropy", random_seed:int=42):
@@ -42,39 +43,15 @@ class RecurrentNetwork(Network):
                 )
         self.layers.append(output_layer)
 
-    def forward_sequence(self, sequence:list[list[float]]) -> list[list[float]]:
+    def train(self, inputs:list[list[float]], targets:list[float], learning_rate:float, momentum:float):
         '''
-        Predict outputs for a sequence of inputs.
-        sequence: list of input vectors for each timestep
-        returns: list of output vectors for each timestep
+        Parameters:
+            inputs: 2D array / array of vectors where each row is a input vector at time t
+                    e.g., sentence --> words
+            targets: 2D array where each row is the expected output vector and columns is the
+                     expected single value for that output neuron
         '''
+        
 
-        output_sequence = []
-        for vector in sequence:
-            output  = vector
-            for layer in self.layers:
-                output  = layer.forward(output)
-            output_sequence.append(output)
-        return output_sequence
-    
-    def predict_next(self, seed_sequence:list[list[float]], n:int) -> list[list[float]]:
-        '''
-        Predict the next n outputs given the sequence
-        seed_sequence: list of one-hot input vectors
-        n: number of future words to predict
-        '''
-        # Initialize the hidden state with the seed sequence
-        output_sequence = self.forward_sequence(seed_sequence)
-        last_input      = seed_sequence[-1]
-
-        for _ in range(n):
-            # Predict the next word based on last output
-            next_output = last_input
-            for layer in self.layers:
-                next_output = layer.forward(next_output)
-            output_sequence.append(next_output)
-
-            # The predicted output becomes the next input
-            last_input  = next_output
-
-        return output_sequence
+    def predict(self, inputs):
+        return

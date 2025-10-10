@@ -46,9 +46,9 @@ class Layer():
         for neuron in self.neurons:
             neuron.inputs[:-1]  = inputs    # Do not overwrite bias
             if self.active == Activation.softmax:
-                outputs.append(neuron.active(self.neurons))
+                outputs.append(neuron.active(neuron.scalar(), self.neurons))
             else:
-                outputs.append(neuron.active())
+                outputs.append(neuron.active(neuron.scalar()))
 
         self.outputs    = outputs
         return outputs
